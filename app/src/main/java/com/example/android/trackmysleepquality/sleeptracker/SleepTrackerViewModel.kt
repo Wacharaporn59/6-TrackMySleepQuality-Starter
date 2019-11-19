@@ -21,8 +21,10 @@ import android.provider.SyncStateContract.Helpers.insert
 import android.provider.SyncStateContract.Helpers.update
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.example.android.trackmysleepquality.database.SleepDatabaseDao
 import com.example.android.trackmysleepquality.database.SleepNight
+import com.example.android.trackmysleepquality.formatNights
 import kotlinx.coroutines.*
 
 /**
@@ -33,6 +35,11 @@ class SleepTrackerViewModel(
         application: Application) : AndroidViewModel(application) {
     private var viewModelJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val nights = database.getAllNights()
+    val nightsString = Transformations.map(nights) { nights ->
+        formatNights(nights, application.resources)
+    }
+
     private var tonight = MutableLiveData<SleepNight?>()
     init {
         initializeTonight()
